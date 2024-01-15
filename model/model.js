@@ -2,25 +2,27 @@ const mongoose = require("mongoose");
 
 
 
-//new task
-const taskSchema = new mongoose.Schema({
-  task_name: String,
+
+
+
+//new project
+const projectSchema = new mongoose.Schema({
+  projectName: String,
   description: String,
   date: String,
-  assign: String,
+  isCompleted: Boolean,
+  allTask:Array
 });
-const Task = mongoose.model("allTask", taskSchema);
 
+const Project = mongoose.model("AllProject", projectSchema);
 //new user
-const newUserSchema= new mongoose.Schema({
-    email:String,
-    name:String,
-    mobile:String,
-    role:String,
-})
-const Users = mongoose.model("allUsers", newUserSchema)
-
-
+const newUserSchema = new mongoose.Schema({
+  email: String,
+  name: String,
+  mobile: String,
+  role: String,
+});
+const Users = mongoose.model("allUsers", newUserSchema);
 
 //export model
-module.exports = { Task,Users };
+module.exports = {  Users, Project };
