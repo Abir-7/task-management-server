@@ -51,7 +51,7 @@ const findAllTask = async (id) => {
       },
       
     ])
-console.log(getAllTask)
+//console.log(getAllTask)
   
     const withOutAdmin=await Users.find({role:'user'})
 

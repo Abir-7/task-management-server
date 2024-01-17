@@ -1,11 +1,20 @@
 const express = require("express");
-require("dotenv").config();
-var cors = require("cors");
+
+
+
+const cors = require('cors')
 const app = express();
-const port = 3000;
-app.use(express.json());
-app.use(cors());
+
+app.use(cors({origin:'*'}));
+app.use(express.json())
+
+require("dotenv").config();
+
+
+
+const port = process.env.PORT || 3000;
 var jwt = require("jsonwebtoken");
+
 
 const {
   addNewTask,
@@ -55,8 +64,9 @@ const verifyJWT = (req, res, next) => {
 
 //jwt token
 app.post("/jwt", (req, res) => {
-  ////console.log("hit");
+//console.log("hit");
   const user = req.body;
+  //console.log(user,'user')
   const token = jwt.sign(user, process.env.ACCESS_Token, { expiresIn: "10h" });
   res.send({ token });
 });
@@ -151,9 +161,9 @@ app.put("/updateProject", verifyJWT, verifyAdmin, async (req, res) => {
   }
 });
 //get all project
-app.get("/getAllProject",verifyJWT,async (req, res) => {
+app.get("/getAllProject", verifyJWT, async (req, res) => {
   try {
-    console.log('hit project')
+   // console.log("hit project");
     const allProject = await getAllProject();
     res.status(201).send(allProject);
   } catch (error) {
@@ -167,6 +177,7 @@ app.post("/addTask", async (req, res) => {
   try {
     const data = req.body;
     const saveTask = await addNewTask(data);
+
     res.status(201).send({
       message: "Task added successfully",
       addedTask: saveTask,
@@ -180,7 +191,6 @@ app.post("/addTask", async (req, res) => {
 //get all task
 app.get("/getAllTask/:id", verifyJWT, async (req, res) => {
   try {
-
     const id = req.params.id;
 
     const allTask = await findAllTask(id);
@@ -196,6 +206,7 @@ app.put("/updateTask", async (req, res) => {
   try {
     const data = req.body;
     const updatedTask = await updateTask(data);
+
     res.status(201).send({
       message: "Task updated successfully",
       updatedTask: updatedTask,
@@ -222,7 +233,8 @@ app.delete("/deleteTask", async (req, res) => {
 
 
 
+
 //app listening
 app.listen(port, () => {
-  console.log(`task-managemnet app listening on port ${port}`);
+  console.log(`task-managemnet app listening on port ${port}`)
 });
