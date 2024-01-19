@@ -21,6 +21,7 @@ const newUserSchema = new mongoose.Schema({
   name: String,
   mobile: String,
   role: String,
+  photoURL:String,
 });
 const Users = mongoose.model("allUsers", newUserSchema);
 

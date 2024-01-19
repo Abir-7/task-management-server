@@ -37,10 +37,10 @@ const updateProject = async (projectData) => {
 const addNewTask = async (taskData) => {
   try {
     const userEmail = taskData.taskData.assign;
-
     const person = await Users.findOne({ email: userEmail }).select({
       email: 1,
       name: 1,
+      photoURL:1
     });
 
     const project = await Project.updateOne(
@@ -114,7 +114,7 @@ const deleteTask = async (data) => {
 //add new user
 const addNewUser = async (userdata) => {
   try {
-    //console.log(userdata);
+    console.log(userdata);
     userdata.mobile = userdata.mobile.toString();
     const findUser = await Users.find({ email: userdata.email });
     //console.log(findUser, "found");
