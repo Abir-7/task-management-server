@@ -21,6 +21,11 @@ const io = new Server(httpServer,{
 io.on('connection', (socket) => {
   console.log('A user connected');
   socket.emit('fromServer','server-msg')
+
+  socket.on('allTask-from-client',(data=>{
+    socket.emit('all-task-from-server',data)
+  }))
+
   socket.on('disconnect', () => {
   console.log('User disconnected');
   });
@@ -188,10 +193,11 @@ app.post("/addTask", async (req, res) => {
   try {
     const data = req.body;
     const saveTask = await addNewTask(data);
-
+    const allTask=await findAllTask(data.id)
     res.status(201).send({
       message: "Task added successfully",
       addedTask: saveTask,
+      allTask:allTask
     });
   } catch (error) {
     //console.log(error, "addTask");
