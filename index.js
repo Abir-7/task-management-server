@@ -7,13 +7,13 @@ require("dotenv").config();
 var jwt = require("jsonwebtoken");
 const port = process.env.PORT || 3000;
 
-app.use(cors({origin:'*'}));
+app.use(cors());
 app.use(express.json())
 
 const httpServer = createServer(app);
 const io = new Server(httpServer,{
   cors: {
-    origin: "*"
+    origin: "http://localhost:5173",credentials:true
   }
 })
 
