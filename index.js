@@ -13,7 +13,7 @@ app.use(express.json())
 const httpServer = createServer(app);
 const io = new Server(httpServer,{
   cors: {
-    origin: "http://localhost:5173",credentials:true
+    origin: "https://task-management-system-ebaff.web.app",credentials:true
   }
 })
 
