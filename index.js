@@ -1,19 +1,30 @@
+const { createServer } = require("http");
+const { Server } = require("socket.io")
 const express = require("express");
-
-
-
 const cors = require('cors')
 const app = express();
+require("dotenv").config();
+var jwt = require("jsonwebtoken");
+const port = process.env.PORT || 3000;
 
 app.use(cors({origin:'*'}));
 app.use(express.json())
 
-require("dotenv").config();
+const httpServer = createServer(app);
+const io = new Server(httpServer,{
+  cors: {
+    origin: "*"
+  }
+})
 
 
-
-const port = process.env.PORT || 3000;
-var jwt = require("jsonwebtoken");
+io.on('connection', (socket) => {
+  console.log('A user connected');
+  socket.emit('fromServer','server-msg')
+  socket.on('disconnect', () => {
+  console.log('User disconnected');
+  });
+})
 
 
 const {
@@ -50,7 +61,7 @@ const verifyJWT = (req, res, next) => {
   // bearer token
   const token = authorization.split(" ")[1];
 
-  ////console.log(token);
+  //////console.log(token);
   jwt.verify(token, process.env.ACCESS_Token, (err, decoded) => {
     if (err) {
       return res
@@ -64,9 +75,9 @@ const verifyJWT = (req, res, next) => {
 
 //jwt token
 app.post("/jwt", (req, res) => {
-//console.log("hit");
+////console.log("hit");
   const user = req.body;
-  //console.log(user,'user')
+  ////console.log(user,'user')
   const token = jwt.sign(user, process.env.ACCESS_Token, { expiresIn: "10h" });
   res.send({ token });
 });
@@ -77,7 +88,7 @@ const verifyAdmin = async (req, res, next) => {
   const isAdmin = await checkAdmin(email);
 
   if (isAdmin == false) {
-    //////////console.log('false section')
+    ////////////console.log('false section')
     return res
       .status(403)
       .send({ error: true, message: "forbidden Access", isAdmin: false });
@@ -90,13 +101,13 @@ app.get("/checkAdmin", verifyJWT, async (req, res) => {
   try {
     const email = req.decoded.email;
     const email2 = req.query.email;
-    //console.log("sdsa", email2);
+    ////console.log("sdsa", email2);
 
     const checkIsAdmin = await checkAdmin(email2);
-    //console.log(checkIsAdmin);
+    ////console.log(checkIsAdmin);
     res.status(201).send({ isAdmin: checkIsAdmin });
   } catch (error) {
-    console.log(error, "checkAdmin");
+    //console.log(error, "checkAdmin");
     throw error;
   }
 });
@@ -106,7 +117,7 @@ app.post("/addNewUser", async (req, res) => {
   try {
     const data = req.body;
     const saveNewUser = await addNewUser(data);
-    //console.log(saveNewUser, "main");
+    ////console.log(saveNewUser, "main");
     res.status(201).send({
       message:
         saveNewUser == "Duplicate User"
@@ -115,7 +126,7 @@ app.post("/addNewUser", async (req, res) => {
       newUser: saveNewUser,
     });
   } catch (error) {
-    console.log(error, "addNewUser");
+    //console.log(error, "addNewUser");
     throw error;
   }
 });
@@ -124,10 +135,10 @@ app.post("/addNewUser", async (req, res) => {
 app.get("/getAllUser", verifyJWT, verifyAdmin, async (req, res) => {
   try {
     const allUser = await getAllUser();
-    ////console.log(allUser);
+    //////console.log(allUser);
     res.status(201).send(allUser);
   } catch (error) {
-    console.log(error, "getAllUser");
+    //console.log(error, "getAllUser");
     throw error;
   }
 });
@@ -141,7 +152,7 @@ app.post("/addProject", verifyJWT, verifyAdmin, async (req, res) => {
       newProject,
     });
   } catch (error) {
-    console.log(error, "addProject");
+    //console.log(error, "addProject");
     throw error;
   }
 });
@@ -156,18 +167,18 @@ app.put("/updateProject", verifyJWT, verifyAdmin, async (req, res) => {
       updatedProject,
     });
   } catch (error) {
-    console.log(error, "updateProject");
+    //console.log(error, "updateProject");
     throw error;
   }
 });
 //get all project
 app.get("/getAllProject", verifyJWT, async (req, res) => {
   try {
-   // console.log("hit project");
+   // //console.log("hit project");
     const allProject = await getAllProject();
     res.status(201).send(allProject);
   } catch (error) {
-    console.log(error, "getAllProject");
+    //console.log(error, "getAllProject");
     throw error;
   }
 });
@@ -183,7 +194,7 @@ app.post("/addTask", async (req, res) => {
       addedTask: saveTask,
     });
   } catch (error) {
-    console.log(error, "addTask");
+    //console.log(error, "addTask");
     throw error;
   }
 });
@@ -194,10 +205,10 @@ app.get("/getAllTask/:id", verifyJWT, async (req, res) => {
     const id = req.params.id;
 
     const allTask = await findAllTask(id);
-    // //console.log(allTask)
+    // ////console.log(allTask)
     res.status(201).send(allTask);
   } catch (error) {
-    console.log(error, "getAllTask");
+    //console.log(error, "getAllTask");
     throw error;
   }
 });
@@ -212,7 +223,7 @@ app.put("/updateTask", async (req, res) => {
       updatedTask: updatedTask,
     });
   } catch (error) {
-    console.log(error, "updateTask");
+    //console.log(error, "updateTask");
     throw error;
   }
 });
@@ -226,7 +237,7 @@ app.delete("/deleteTask", async (req, res) => {
       deletedTask: deletedTask,
     });
   } catch (error) {
-    console.log(error, "deleteTask");
+    //console.log(error, "deleteTask");
     throw error;
   }
 });
@@ -235,6 +246,6 @@ app.delete("/deleteTask", async (req, res) => {
 
 
 //app listening
-app.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`task-managemnet app listening on port ${port}`)
 });

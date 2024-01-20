@@ -5,19 +5,19 @@ const checkAdmin= async(email)=>{
   try {
     let isAdmin
     const person= await Users.findOne({email:email})
-    //console.log(person,'person')
+    ////console.log(person,'person')
     if(person.role=='admin'){
-      //console.log('hit')
+      ////console.log('hit')
       isAdmin=true
       return isAdmin
     }
     else{
-      //console.log('hit2')
+      ////console.log('hit2')
       isAdmin=false
       return isAdmin
     }
   } catch (error) {
-    //console.log("a Error", error);
+    ////console.log("a Error", error);
   }
 }
 
@@ -51,7 +51,7 @@ const findAllTask = async (id) => {
       },
       
     ])
-//console.log(getAllTask)
+////console.log(getAllTask)
   
     const withOutAdmin=await Users.find({role:'user'})
 
@@ -61,7 +61,7 @@ const findAllTask = async (id) => {
 
     return {getAllTask:getAllTask[0].allTask,assignedPerson:getAllTask[0].allPersons,withOutAdmin,pendingTask,onGoingTask,completedTask,isCompleted:getAllTask[0].isCompleted};
   } catch (error) {
-    //console.log("a Error", error);
+    ////console.log("a Error", error);
   }
 };
 
@@ -72,7 +72,7 @@ const getAllProject= async()=>{
       const completedProject=await Project.find({isCompleted:true})
       return{pendingProject,completedProject}
   } catch (error) {
-    //console.log(error)
+    ////console.log(error)
   }
 }
 

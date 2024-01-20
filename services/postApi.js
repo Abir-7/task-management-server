@@ -9,7 +9,7 @@ const addNewProject = async (projectData) => {
     const saveProject = await newProject.save();
     return saveProject;
   } catch (error) {
-    //console.log("add project Error", error);
+    ////console.log("add project Error", error);
   }
 };
 
@@ -29,7 +29,7 @@ const updateProject = async (projectData) => {
     );
     return updateProject;
   } catch (error) {
-    //console.log("add project Error", error);
+    ////console.log("add project Error", error);
   }
 };
 
@@ -59,7 +59,7 @@ const addNewTask = async (taskData) => {
     );
     return project;
   } catch (error) {
-    //console.log("add task Error", error);
+    ////console.log("add task Error", error);
   }
 };
 //update a task
@@ -69,7 +69,7 @@ const updateTask = async (data) => {
     const taskName = data.taskName;
     const status = data.status;
     const description = data.description;
-    //console.log(description,'aaaaaaaaaaa',status)
+    ////console.log(description,'aaaaaaaaaaa',status)
     const updateTask = await Project.updateOne(
       {
         _id: new mongoose.Types.ObjectId(id),
@@ -89,7 +89,7 @@ const updateTask = async (data) => {
 
     return updateTask;
   } catch (error) {
-    //console.log(error)
+    ////console.log(error)
   }
 };
 //
@@ -114,10 +114,10 @@ const deleteTask = async (data) => {
 //add new user
 const addNewUser = async (userdata) => {
   try {
-    console.log(userdata);
+    //console.log(userdata);
     userdata.mobile = userdata.mobile.toString();
     const findUser = await Users.find({ email: userdata.email });
-    //console.log(findUser, "found");
+    ////console.log(findUser, "found");
     if (!findUser) {
       const saveUser = "Duplicate User";
       return saveUser;
@@ -127,7 +127,7 @@ const addNewUser = async (userdata) => {
       return saveUser;
     }
   } catch (error) {
-    //console.log("add user Error", error);
+    ////console.log("add user Error", error);
   }
 };
 module.exports = {
