@@ -19,7 +19,11 @@ const io = new Server(httpServer,{
 
 
 io.on('connection', (socket) => {
-  console.log(`A user connected ${socket.id}`);
+  socket.on("user",(email)=>{
+    console.log(email+'connected')
+
+    
+  })
 
   socket.emit('fromServer','server-msg')
 
@@ -27,9 +31,6 @@ io.on('connection', (socket) => {
     socket.emit('all-task-from-server',data)
   }))
 
-  socket.on('disconnect', () => {
-  console.log('User disconnected');
-  });
 })
 
 
