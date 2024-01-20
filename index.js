@@ -19,17 +19,18 @@ const io = new Server(httpServer,{
 
 
 io.on('connection', (socket) => {
+
+
   socket.on("user",(email)=>{
     console.log(email+'connected')
 
-    
+    socket.on('allTask-from-client',(data=>{
+      socket.emit('all-task-from-server',data)
+    }))
+
   })
 
-  socket.emit('fromServer','server-msg')
-
-  socket.on('allTask-from-client',(data=>{
-    socket.emit('all-task-from-server',data)
-  }))
+ 
 
 })
 
