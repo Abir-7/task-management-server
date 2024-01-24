@@ -1,10 +1,5 @@
 const mongoose = require("mongoose");
 
-
-
-
-
-
 //new project
 const projectSchema = new mongoose.Schema({
   projectName: String,
@@ -25,5 +20,25 @@ const newUserSchema = new mongoose.Schema({
 });
 const Users = mongoose.model("allUsers", newUserSchema);
 
+
+//new connection 
+
+
+const connectionSchema= new mongoose.Schema({
+  requestedBy:String,
+ persons:[Object],
+ status:String
+})
+
+const UserConections=mongoose.model("all_connection",connectionSchema)
+
+
+const messageSchema= new mongoose.Schema({
+  connect_Id:String,
+  msgData:{email:String,message:String}
+})
+
+const MessageModel=mongoose.model('all_message',messageSchema)
+
 //export model
-module.exports = {  Users, Project };
+module.exports = {  Users, Project,UserConections,MessageModel };

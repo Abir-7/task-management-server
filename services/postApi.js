@@ -1,5 +1,5 @@
 const { set } = require("mongoose");
-const { Users, Project } = require("../model/model");
+const { Users, Project, UserConections, MessageModel } = require("../model/model");
 const mongoose = require("mongoose");
 
 //add new Project
@@ -130,6 +130,71 @@ const addNewUser = async (userdata) => {
     ////console.log("add user Error", error);
   }
 };
+
+//create connection 
+
+const createConnections=async(data)=>{
+try {
+
+  if (data.email1 == data.email2) {
+    return { msg: "email must be defferent" ,data:{}};
+  }
+
+  const findConnection= await UserConections.findOne({
+    $and: [
+      { persons: { $elemMatch: { email: data.email1 } } },
+      { persons: { $elemMatch: { email: data.email2 } } }
+    ]
+  })
+
+  if(findConnection){
+   // console.log(findConnection)
+    return {msg:'allready has connection',data:findConnection}
+  }
+
+  const user1= await Users.findOne({email:data.email1}).select({name:1,photoURL:1})
+  const user2= await Users.findOne({email:data.email2}).select({name:1,photoURL:1})
+  console.log(data,'connection',user2)
+
+  const createConnection= new UserConections({requestedBy:data.email1,status:'pending',persons:[{email:data.email1,name:user1.name,photoURL:user1.photoURL},{email:data.email2,name:user2.name,photoURL:user2.photoURL}]})
+  const savedConnection =await createConnection.save()
+  return {msg:'connection create successfull',data:savedConnection}
+} catch (error) {
+  throw error
+}
+}
+
+const statusUpdate=async(data)=>{
+try {
+  const updateStatus= await UserConections.updateOne({_id: new mongoose.Types.ObjectId(data.id)},{
+    $set:{
+      status:data.status
+    }
+  })
+  const requestedBy= await  UserConections.findOne({_id: new mongoose.Types.ObjectId(data.id)})
+  console.log(updateStatus,'update status')
+
+  return {updateStatus,requestedBy:requestedBy.requestedBy}
+
+} catch (error) {
+  throw error
+}
+}
+
+const messagePost=async(data)=>{
+try {
+  const {connect_Id,msgData}=data
+  const message= new MessageModel({connect_Id,msgData})
+
+  const saveMessage= await message.save()
+  return saveMessage
+} catch (error) {
+  throw error
+}
+}
+
+
+
 module.exports = {
   addNewTask,
   addNewUser,
@@ -137,4 +202,7 @@ module.exports = {
   updateTask,
   deleteTask,
   updateProject,
+  createConnections,
+  statusUpdate,
+  messagePost
 };
