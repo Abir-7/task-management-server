@@ -36,9 +36,9 @@ io.on("connection", (socket) => {
     console.log(`User joined room: ${room}`);
   });
 
-  socket.on("message", (room, message) => {
-    io.to(room).emit("message", message);
-  });
+  // socket.on("message", (room, message) => {
+  //   io.to(room).emit("message", message);
+  // });
 
   socket.on("refetchAllConnectionFromCient", (data) => {
     io.emit("refetchAllConnectionFromServer", data);
@@ -46,10 +46,9 @@ io.on("connection", (socket) => {
 
   socket.on("refetchPendingFromCient", (email) => {
     //console.log(email,'email from client')
-    io.emit('pendigStatus',email)
+    io.emit("pendigStatus", email);
   });
 
-  
   socket.on("disconnect", () => {
     console.log(`User disconnected`);
 
@@ -57,7 +56,6 @@ io.on("connection", (socket) => {
     delete onlineUsers[socket.id];
     io.emit("updateOnlineUsers", Object.values(onlineUsers));
   });
-
 });
 
 const {
@@ -338,6 +336,9 @@ app.post("/postMsg", async (req, res) => {
     //console.log(data)
     const postMessage = await messagePost(data);
     const getMessage = await allMessageByID(data.connect_Id);
+
+    io.emit("message", {id:data.connect_Id,getMessage:getMessage});
+
     res.status(201).send({
       message: "message sent successfully",
       postMessage: postMessage,
