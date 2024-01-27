@@ -336,11 +336,11 @@ app.post("/postMsg", async (req, res) => {
     //console.log(data)
     const postMessage = await messagePost(data);
     io.emit("message", {id:data.connect_Id,getMessage:postMessage});
-    const getMessage = await allMessageByID(data.connect_Id);
+    //const getMessage = await allMessageByID(data.connect_Id);
     res.status(201).send({
       message: "message sent successfully",
       postMessage: postMessage,
-      allMessage: getMessage,
+      //allMessage: getMessage,
     });
   } catch (error) {
     console.log("save message ", error);
