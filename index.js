@@ -335,10 +335,8 @@ app.post("/postMsg", async (req, res) => {
     const data = req.body;
     //console.log(data)
     const postMessage = await messagePost(data);
-    const getMessage = await allMessageByID(data.connect_Id);
-
     io.emit("message", {id:data.connect_Id,getMessage:getMessage});
-
+    const getMessage = await allMessageByID(data.connect_Id);
     res.status(201).send({
       message: "message sent successfully",
       postMessage: postMessage,
