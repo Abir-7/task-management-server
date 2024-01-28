@@ -36,7 +36,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("message", (data) => {
-    io.emit("message2", data);
+    //io.emit("message2", data);
   });
 
 
@@ -335,7 +335,7 @@ app.post("/postMsg", async (req, res) => {
     const data = req.body;
     //console.log(data)
     const postMessage = await messagePost(data);
-
+    io.emit("message2", postMessage)
     //const getMessage = await allMessageByID(data.connect_Id);
     return res.status(201).send({
       message: "message sent successfully",
