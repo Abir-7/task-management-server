@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("message", (data) => {
-    io.emit("message", data);
+    io.emit("message2", data);
   });
 
   socket.on("refetchPendingFromCient", (email) => {
