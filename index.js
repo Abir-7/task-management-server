@@ -13,7 +13,7 @@ require("dotenv").config();
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: ["https://task-management-system-ebaff.web.app","http://localhost:5173"],
+  cors: ["https://task-management-system-ebaff.web.app","http://localhost:5173,https://task-management-system-with-chat.netlify.app"],
   methods: ["GET", "POST"],
 });
 
