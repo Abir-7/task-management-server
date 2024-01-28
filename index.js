@@ -13,7 +13,10 @@ require("dotenv").config();
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: ["https://task-management-system-ebaff.web.app","http://localhost:5173,https://task-management-system-with-chat.netlify.app"],
+  cors: [
+    "https://task-management-system-ebaff.web.app",
+    "http://localhost:5173,https://task-management-system-with-chat.netlify.app",
+  ],
   methods: ["GET", "POST"],
 });
 
@@ -23,20 +26,16 @@ var jwt = require("jsonwebtoken");
 let onlineUsers = [];
 
 io.on("connection", (socket) => {
-  
-  
-  socket.on("login", (userEmail) => {;
+  socket.on("login", (userEmail) => {
     console.log(`User Connected: ${userEmail}`);
 
-    const isExist= onlineUsers?.find(user=>user.userEmail===userEmail)
-    if(!isExist){
-      onlineUsers.push({userEmail:userEmail,socketID:socket.id})
-      io.emit("updateOnlineUsers",onlineUsers)
+    const isExist = onlineUsers?.find((user) => user.userEmail === userEmail);
+    if (!isExist) {
+      onlineUsers.push({ userEmail: userEmail, socketID: socket.id });
+      io.emit("updateOnlineUsers", onlineUsers);
+    } else {
+      io.emit("updateOnlineUsers", onlineUsers);
     }
-    else{
-      io.emit("updateOnlineUsers",onlineUsers)
-    }
-   ;
   });
 
   socket.on("join", (room) => {
@@ -45,20 +44,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("refetchAllConnectionFromCient", (data) => {
-  console.log(data,'socket msg')
+    console.log(data, "socket msg");
     io.emit("refetchAllConnectionFromServer", data);
   });
 
+  socket.on("message", (data) => {
+    io.emit("message", data);
+  });
+
   socket.on("refetchPendingFromCient", (email) => {
-    //console.log(email,'email from client')
     io.emit("pendigStatus", email);
   });
 
   socket.on("disconnect", () => {
     console.log(`User disconnected`);
-   onlineUsers=onlineUsers.filter(user=>user.socketID !== socket.id)
-    console.log(onlineUsers)
-    io.emit("updateOnlineUsers",onlineUsers)
+    onlineUsers = onlineUsers.filter((user) => user.socketID !== socket.id);
+    console.log(onlineUsers);
+    io.emit("updateOnlineUsers", onlineUsers);
   });
 });
 
@@ -229,7 +231,7 @@ app.post("/addTask", async (req, res) => {
   try {
     const data = req.body;
     const saveTask = await addNewTask(data);
-    io.emit("newTask", saveTask)
+    io.emit("newTask", saveTask);
     res.status(201).send({
       message: "Task added successfully",
       addedTask: saveTask,
@@ -244,7 +246,6 @@ app.post("/addTask", async (req, res) => {
 app.get("/getAllTask/:id", verifyJWT, async (req, res) => {
   try {
     const id = req.params.id;
-
     const allTask = await findAllTask(id);
     // //console.log(allTask)
     res.status(201).send(allTask);
@@ -258,7 +259,7 @@ app.put("/updateTask", async (req, res) => {
   try {
     const data = req.body;
     const updatedTask = await updateTask(data);
-    io.emit("newTask",updatedTask)
+    io.emit("newTask", updatedTask);
     res.status(201).send({
       message: "Task updated successfully",
       updatedTask: updatedTask,
@@ -273,7 +274,7 @@ app.delete("/deleteTask", async (req, res) => {
   try {
     const data = req.body;
     const deletedTask = await deleteTask(data);
-    io.emit("newTask",deleteTask)
+    io.emit("newTask", deleteTask);
     res.status(201).send({
       message: "Task deleted successfully",
       deletedTask: deletedTask,
@@ -339,7 +340,7 @@ app.post("/postMsg", async (req, res) => {
     const data = req.body;
     //console.log(data)
     const postMessage = await messagePost(data);
-     io.emit("message", {id:data.connect_Id,getMessage:postMessage});
+
     //const getMessage = await allMessageByID(data.connect_Id);
     res.status(201).send({
       message: "message sent successfully",
