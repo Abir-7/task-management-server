@@ -13,7 +13,7 @@ require("dotenv").config();
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: 'https://task-management-system-with-chat.netlify.app',
+  cors:'https://task-management-system-with-chat.netlify.app',
   methods: ["GET", "POST"],
 });
 
@@ -38,12 +38,13 @@ io.on("connection", (socket) => {
   socket.on("join", (room) => {
     socket.join(room);
     console.log(`User joined room: ${room}`);
+    socket.on("message", (data) => {
+      console.log(data.connect_Id)
+      io.to(data.connect_Id).emit("message2", data);
+    });
+  
   });
 
-  socket.on("message", (data) => {
-    console.log(data.connect_Id)
-    io.to(data.connect_Id).emit("message2", data);
-  });
 
   socket.on("refetchAllConnectionFromCient", (data) => {
     console.log(data, "socket msg");
@@ -342,7 +343,7 @@ app.post("/postMsg", async (req, res) => {
     const postMessage = await messagePost(data);
 
     //const getMessage = await allMessageByID(data.connect_Id);
-    res.status(201).send({
+    return res.status(201).send({
       message: "message sent successfully",
       postMessage: postMessage,
       //allMessage: getMessage,
