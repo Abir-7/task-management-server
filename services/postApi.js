@@ -94,7 +94,10 @@ const updateTask = async (data) => {
 };
 //
 const deleteTask = async (data) => {
+  console.log(data,'id')
+
   const id = data.id;
+
   const taskName = data.taskName;
   const description = data.description;
   const deleleTask = await Project.updateOne(
@@ -110,6 +113,8 @@ const deleteTask = async (data) => {
       },
     }
   );
+
+  return deleleTask
 };
 //add new user
 const addNewUser = async (userdata) => {

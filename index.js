@@ -13,22 +13,30 @@ require("dotenv").config();
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: "https://task-management-system-ebaff.web.app",
+  cors: ["https://task-management-system-ebaff.web.app","http://localhost:5173"],
   methods: ["GET", "POST"],
 });
 
 const port = process.env.PORT || 3000;
 var jwt = require("jsonwebtoken");
 
-const onlineUsers = {};
+let onlineUsers = [];
 
 io.on("connection", (socket) => {
-  console.log(`User Connected: ${socket.id}`);
+  
+  
+  socket.on("login", (userEmail) => {;
+    console.log(`User Connected: ${userEmail}`);
 
-  socket.on("login", (username) => {
-    //console.log(username, "user");
-    onlineUsers[socket.id] = username;
-    io.emit("updateOnlineUsers", Object.values(onlineUsers));
+    const isExist= onlineUsers?.find(user=>user.userEmail===userEmail)
+    if(!isExist){
+      onlineUsers.push({userEmail:userEmail,socketID:socket.id})
+      io.emit("updateOnlineUsers",onlineUsers)
+    }
+    else{
+      io.emit("updateOnlineUsers",onlineUsers)
+    }
+   ;
   });
 
   socket.on("join", (room) => {
@@ -36,11 +44,8 @@ io.on("connection", (socket) => {
     console.log(`User joined room: ${room}`);
   });
 
-  // socket.on("message", (room, message) => {
-  //   io.to(room).emit("message", message);
-  // });
-
   socket.on("refetchAllConnectionFromCient", (data) => {
+  console.log(data,'socket msg')
     io.emit("refetchAllConnectionFromServer", data);
   });
 
@@ -51,10 +56,9 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log(`User disconnected`);
-
-    //const username = onlineUsers[socket.id];
-    delete onlineUsers[socket.id];
-    io.emit("updateOnlineUsers", Object.values(onlineUsers));
+   onlineUsers=onlineUsers.filter(user=>user.socketID !== socket.id)
+    console.log(onlineUsers)
+    io.emit("updateOnlineUsers",onlineUsers)
   });
 });
 
@@ -136,7 +140,6 @@ const verifyAdmin = async (req, res, next) => {
 
 app.get("/checkAdmin", verifyJWT, async (req, res) => {
   try {
-    const email = req.decoded.email;
     const email2 = req.query.email;
     //console.log("sdsa", email2);
 
@@ -226,7 +229,7 @@ app.post("/addTask", async (req, res) => {
   try {
     const data = req.body;
     const saveTask = await addNewTask(data);
-
+    io.emit("newTask", saveTask)
     res.status(201).send({
       message: "Task added successfully",
       addedTask: saveTask,
@@ -255,7 +258,7 @@ app.put("/updateTask", async (req, res) => {
   try {
     const data = req.body;
     const updatedTask = await updateTask(data);
-
+    io.emit("newTask",updatedTask)
     res.status(201).send({
       message: "Task updated successfully",
       updatedTask: updatedTask,
@@ -270,6 +273,7 @@ app.delete("/deleteTask", async (req, res) => {
   try {
     const data = req.body;
     const deletedTask = await deleteTask(data);
+    io.emit("newTask",deleteTask)
     res.status(201).send({
       message: "Task deleted successfully",
       deletedTask: deletedTask,
@@ -335,7 +339,7 @@ app.post("/postMsg", async (req, res) => {
     const data = req.body;
     //console.log(data)
     const postMessage = await messagePost(data);
-    io.emit("message", {id:data.connect_Id,getMessage:postMessage});
+     io.emit("message", {id:data.connect_Id,getMessage:postMessage});
     //const getMessage = await allMessageByID(data.connect_Id);
     res.status(201).send({
       message: "message sent successfully",
