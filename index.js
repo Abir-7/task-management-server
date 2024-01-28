@@ -36,8 +36,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("message", (data) => {
-    console.log(data.connect_Id)
-    io.to(data.connect_Id).emit("message2", data);
+    io.emit("message2", data);
   });
 
 
