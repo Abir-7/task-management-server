@@ -13,10 +13,7 @@ require("dotenv").config();
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: [
-    "https://task-management-system-ebaff.web.app",
-    "http://localhost:5173,https://task-management-system-with-chat.netlify.app",
-  ],
+  cors: 'http://localhost:5173',
   methods: ["GET", "POST"],
 });
 
@@ -43,14 +40,17 @@ io.on("connection", (socket) => {
     console.log(`User joined room: ${room}`);
   });
 
+  socket.on("message", (data) => {
+    console.log(data.connect_Id)
+    io.to(data.connect_Id).emit("message2", data);
+  });
+
   socket.on("refetchAllConnectionFromCient", (data) => {
     console.log(data, "socket msg");
     io.emit("refetchAllConnectionFromServer", data);
   });
 
-  socket.on("message", (data) => {
-    io.emit("message2", data);
-  });
+
 
   socket.on("refetchPendingFromCient", (email) => {
     io.emit("pendigStatus", email);
