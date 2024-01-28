@@ -35,14 +35,9 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("join", (room) => {
-    socket.join(room);
-    console.log(`User joined room: ${room}`);
-    socket.on("message", (data) => {
-      console.log(data.connect_Id)
-      io.to(data.connect_Id).emit("message2", data);
-    });
-  
+  socket.on("message", (data) => {
+    console.log(data.connect_Id)
+    io.to(data.connect_Id).emit("message2", data);
   });
 
 
