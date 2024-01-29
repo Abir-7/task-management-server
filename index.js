@@ -66,11 +66,14 @@ socket.on('taskDeleted',(data=>{
 }))
 
   socket.on("disconnect", () => {
-    //console.log('user disconnected',socket.id); // undefined
+
+    console.log('user disconnected',socket.id);
+
     onlineUsers = onlineUsers.filter((user) => user.socketID !== socket.id);
     io.emit("connectedUsers", onlineUsers);
     //console.log(onlineUsers,'after dc',)
   });
+  
 });
 
 app.use(cors({ origin: "*" }));
