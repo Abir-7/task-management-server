@@ -1,63 +1,80 @@
 const express = require("express");
-
-const { createServer, get } = require("http");
+const { createServer } = require("http");
 const { Server } = require("socket.io");
-
 const cors = require("cors");
 const app = express();
-
-app.use(cors({ origin: "*" }));
-app.use(express.json());
-
 require("dotenv").config();
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors:'https://task-management-system-with-chat.netlify.app',
+  cors: "https://task-management-system-with-chat.netlify.app",
   methods: ["GET", "POST"],
 });
 
-const port = process.env.PORT || 3000;
 var jwt = require("jsonwebtoken");
 
 let onlineUsers = [];
 
 io.on("connection", (socket) => {
-  socket.on("login", (userEmail) => {
-    console.log(`User Connected: ${userEmail}`);
 
-    const isExist = onlineUsers?.find((user) => user.userEmail === userEmail);
-    if (!isExist) {
-      onlineUsers.push({ userEmail: userEmail, socketID: socket.id });
-      io.emit("updateOnlineUsers", onlineUsers);
-    } else {
-      io.emit("updateOnlineUsers", onlineUsers);
+  socket.on("users", (email) => {
+    //console.log('A user connected ',socket.id,email)
+    const isExist = onlineUsers.find((user) => user.email == email);
+    if (!isExist && email) {
+      onlineUsers.push({ email: email, socketID: socket.id });
+      io.emit("connectedUsers", onlineUsers);
     }
   });
 
-  socket.on("message", (data) => {
-    io.emit("message2", data);
+  //recive msg from sender and send to reciver person
+  socket.on("msgFromSender", (data) => {
+    io.to(data.receverSocketID.socketID).emit("reciver", {
+      connectionID: data.connectionID,
+      msgData: data.msgData,
+    });
+    io.to(data.senderSocketID.socketID).emit("reciver", {
+      connectionID: data.connectionID,
+      msgData: data.msgData,
+    });
   });
 
+  //recive friend req
+  socket.on('pendingReq',(data)=>{
+    console.log(data)
+    const isExist = onlineUsers.find((user) => user.email == data.reciver.email)
+    if(isExist){
+      io.to(isExist.socketID).emit('pendingReqs',data.msg)
+    }
+  })
+// accept connection status 
 
-  socket.on("refetchAllConnectionFromCient", (data) => {
-    console.log(data, "socket msg");
-    io.emit("refetchAllConnectionFromServer", data);
-  });
+socket.on('connectionStatus',(data=>{
+  const isExist = onlineUsers.find((user) => user.email == data.email)
+  if(isExist){
+    io.to(isExist.socketID).emit('connection_Status',data.msg)
+  }
+}))
 
+//real time add task
+socket.on('taskAdded',(data=>{
+  io.emit('newTaskAdded',data)
+}))
 
-
-  socket.on("refetchPendingFromCient", (email) => {
-    io.emit("pendigStatus", email);
-  });
+//real time task delete
+socket.on('taskDeleted',(data=>{
+  io.emit('deletedTask',data)
+}))
 
   socket.on("disconnect", () => {
-    console.log(`User disconnected`);
+    //console.log('user disconnected',socket.id); // undefined
     onlineUsers = onlineUsers.filter((user) => user.socketID !== socket.id);
-    console.log(onlineUsers);
-    io.emit("updateOnlineUsers", onlineUsers);
+    io.emit("connectedUsers", onlineUsers);
+    //console.log(onlineUsers,'after dc',)
   });
 });
+
+app.use(cors({ origin: "*" }));
+app.use(express.json());
 
 const {
   addNewTask,
@@ -335,7 +352,7 @@ app.post("/postMsg", async (req, res) => {
     const data = req.body;
     //console.log(data)
     const postMessage = await messagePost(data);
-   
+
     //const getMessage = await allMessageByID(data.connect_Id);
     return res.status(201).send({
       message: "message sent successfully",
@@ -373,6 +390,7 @@ app.get("/getAllUserChat/:email", verifyJWT, async (req, res) => {
   }
 });
 
+const port = process.env.PORT || 3000;
 //app listening
 httpServer.listen(port, () => {
   console.log(`task-managemnet app listening on port ${port}`);
