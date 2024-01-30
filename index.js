@@ -7,7 +7,7 @@ require("dotenv").config();
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
-  cors: "https://task-management-system-with-chat.netlify.app",
+  cors: '*',
   methods: ["GET", "POST"],
 });
 
@@ -73,7 +73,7 @@ socket.on('taskDeleted',(data=>{
     io.emit("connectedUsers", onlineUsers);
     //console.log(onlineUsers,'after dc',)
   });
-  
+
 });
 
 app.use(cors({ origin: "*" }));
@@ -394,7 +394,9 @@ app.get("/getAllUserChat/:email", verifyJWT, async (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-//app listening
+
+
 httpServer.listen(port, () => {
   console.log(`task-managemnet app listening on port ${port}`);
 });
+
