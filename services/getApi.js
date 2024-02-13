@@ -106,9 +106,15 @@ const getConnection = async (email) => {
 
     //console.log(allAcceptedConnection)
     //console.log(allPendingConnection)
-    const acceptedConnectionEmail=allAcceptedConnection.flatMap(c=>c.persons.filter(p=>p.email!==email)).map(p=>p.email)
+    const acceptedConnectionEmail = allAcceptedConnection
+      .flatMap((c) => c.persons.filter((p) => p.email !== email))
+      .map((p) => p.email);
 
-    return { allAcceptedConnection, allPendingConnection,acceptedConnectionEmail };
+    return {
+      allAcceptedConnection,
+      allPendingConnection,
+      acceptedConnectionEmail,
+    };
   } catch (error) {
     throw error;
   }
@@ -118,7 +124,7 @@ const getConnection = async (email) => {
 
 const allMessageByID = async (cId) => {
   try {
-    const findAllMessage = await MessageModel.find({connect_Id:cId});
+    const findAllMessage = await MessageModel.find({ connect_Id: cId });
 
     //console.log(findAllMessage)
     return findAllMessage;
@@ -128,31 +134,33 @@ const allMessageByID = async (cId) => {
 };
 
 //get all user Chat
+
 const getAllUserChat = async (email) => {
   try {
-    console.log(email)
-    const pendingConnections= await UserConections.find({
-      $and:[{requestedBy:email},{status:'pending'}]
-    })
+    console.log(email);
+    const pendingConnections = await UserConections.find({
+      $and: [{ requestedBy: email }, { status: "pending" }],
+    });
 
-    const collectEmail = pendingConnections.flatMap((c) => c.persons.filter((p) => p.email !== email).map(p=>p.email))
+    const collectEmail = pendingConnections.flatMap((c) =>
+      c.persons.filter((p) => p.email !== email).map((p) => p.email)
+    );
 
-    const allPendingEmail= await Promise.all(collectEmail)
+    const allPendingEmail = await Promise.all(collectEmail);
 
+    const withAdmin = await Users.find({ email: { $nin: allPendingEmail } });
 
-   const withAdmin = await Users.find({ email: { $nin: allPendingEmail } })
+    const reqestedUser = await Users.find({ email: { $in: allPendingEmail } });
 
-
-   const reqestedUser =await Users.find({ email: { $in: allPendingEmail } })
     //const withAdmin = await Users.find();
     //console.log(filteredUsers,'collectEmail')
+
     const withOutAdmin = await Users.find({ role: "user" });
-    return { withAdmin, withOutAdmin,reqestedUser };
+    return { withAdmin, withOutAdmin, reqestedUser };
   } catch (error) {
-    throw error
+    throw error;
   }
 };
-
 
 module.exports = {
   findAllTask,
@@ -161,5 +169,5 @@ module.exports = {
   getAllProject,
   getConnection,
   allMessageByID,
-  getAllUserChat
+  getAllUserChat,
 };

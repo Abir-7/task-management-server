@@ -76,7 +76,7 @@ var jwt = require("jsonwebtoken");
 
 // });
 
-app.use(cors({ origin: "*" }));
+app.use(cors());
 app.use(express.json());
 
 const {
@@ -246,7 +246,7 @@ app.post("/addTask", async (req, res) => {
   try {
     const data = req.body;
     const saveTask = await addNewTask(data);
-    io.emit("newTask", saveTask);
+    //io.emit("newTask", saveTask);
     res.status(201).send({
       message: "Task added successfully",
       addedTask: saveTask,
@@ -274,7 +274,7 @@ app.put("/updateTask", async (req, res) => {
   try {
     const data = req.body;
     const updatedTask = await updateTask(data);
-    io.emit("newTask", updatedTask);
+  //  io.emit("newTask", updatedTask);
     res.status(201).send({
       message: "Task updated successfully",
       updatedTask: updatedTask,
@@ -289,7 +289,7 @@ app.delete("/deleteTask", async (req, res) => {
   try {
     const data = req.body;
     const deletedTask = await deleteTask(data);
-    io.emit("newTask", deleteTask);
+    //io.emit("newTask", deleteTask);
     res.status(201).send({
       message: "Task deleted successfully",
       deletedTask: deletedTask,
